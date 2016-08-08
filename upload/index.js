@@ -68,18 +68,51 @@ export class Uploader {
     }
     _initInputElement(setting) {
         const el = document.createElement('input')
+
+        Object.entries({
+            type: 'file',
+            accept: setting.accept,
+            multiple: setting.multiple,
+            hidden: true
+        }).forEach(([key, value]) => {
+            el[key] = value
+        })
+
+        return el
     }
 
     // 绑定金子与触发
-    on() {}
-    _callHook(evt, ...args) {}
+    on() {
+        if (evt && typeof cb === 'function') {
+            this['on' + evt] = cb
+        }
+        return this
+    }
+    _callHook(evt, ...args) {
+        if (evt && this['on' + evt]) {
+            return this['on' + evt].apply(this.args)
+        }
+        return
+    }
     loadFiles(files) {}
     // 上传处理
     upload(file) {}
 
     // 交互方法
-    chooseFile(file) {}
-    loadFile(file) {}
+    chooseFile(file) {
+        this.input.value = ''
+        this.input.click()
+    }
+    loadFile(file) {
+        if (!files) return false
+
+        const type = Object.prototype.toString.call(files)
+        if (type === '[object FileList]') {
+
+        } else if (type === '[object Object]' || type === '[object File]') {
+            files = [files]
+        }
+    }
     removeFile() {}
     clear() {
         this.uploadFiles = []
