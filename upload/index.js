@@ -1,3 +1,12 @@
+/**
+ *  功能说明：
+ *  选择文件后可根据配置，自动/手动上传，定制化数据，接收返回。
+ * 可对选择的文件进行控制，如：文件个数，格式不符，超出大小限制等等。
+ * 操作已有文件，如：二次添加、失败重传、删除等等。
+ * 操作上传状态反馈，如：上传中的进度、上传成功/失败。
+ * 可用于拓展更多功能，如：拖拽上传、图片预览、大文件分片等。
+ */
+
 let uid = 1
 
 const parseError = xhr => {
@@ -94,16 +103,7 @@ export class Uploader {
         }
         return
     }
-    loadFiles(files) {}
-    // 上传处理
-    upload(file) {}
-
-    // 交互方法
-    chooseFile(file) {
-        this.input.value = ''
-        this.input.click()
-    }
-    loadFile(file) {
+    loadFiles(files) {
         if (!files) return false
 
         const type = Object.prototype.toString.call(files)
@@ -112,6 +112,27 @@ export class Uploader {
         } else if (type === '[object Object]' || type === '[object File]') {
             files = [files]
         }
+
+        if (this.limit !== -1 && files.length && files.length + this.uploadFiles.length > this.limit) {
+            this._callHook('exceed', files)
+            return false
+        }
+
+        this.uploadFiles = this.uploadFiles.concat(files.map(file => {
+            if (file.uid && file.rawFile) {
+
+            } else {
+
+            }
+        }))
+    }
+    // 上传处理
+    upload(file) {}
+
+    // 交互方法
+    chooseFile(file) {
+        this.input.value = ''
+        this.input.click()
     }
     removeFile() {}
     clear() {
