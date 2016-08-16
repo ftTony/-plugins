@@ -120,11 +120,22 @@ export class Uploader {
 
         this.uploadFiles = this.uploadFiles.concat(files.map(file => {
             if (file.uid && file.rawFile) {
-
+                return file
             } else {
-
+                return {
+                    uid: uid++,
+                    rawFile: file,
+                    fileName: file.name,
+                    size: file.size,
+                    status: 'ready'
+                }
             }
         }))
+
+        this._callHook('change', this.uploadFiles)
+        this.setting.autoUpload && this.upload()
+
+        return true
     }
     // 上传处理
     upload(file) {}
@@ -141,5 +152,25 @@ export class Uploader {
     }
     destroy() {}
     // 核心ajax发起请求
-    _post() {}
+    _post() {
+        if (!file.rawFile) return
+
+        const {
+            headers,
+            data,
+            withCredentials
+        } = this.setting
+        const xhr = new XMLHttpRequest()
+
+        const formData = new FormData()
+        formData.append('file', file.rawFile, file.fileName)
+
+        Object.keys(data).forEach(key => {
+            formData.append(key, data[key])
+        })
+
+        Object.keys(headers).forEach(key => {
+
+        })
+    }
 }
