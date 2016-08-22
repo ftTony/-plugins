@@ -145,12 +145,22 @@ export class Uploader {
         this.input.value = ''
         this.input.click()
     }
-    removeFile() {}
+    removeFile(file) {
+        const id = file.id || false
+        const index = this.uploadFiles.findIndex(item => item.id === id)
+        if (index > -1) {
+            this.uploadFiles.splice(index, 1)
+            this._callHook('change', this.uploadFiles)
+        }
+    }
     clear() {
         this.uploadFiles = []
         this._callHook('change', this.uploadFiles)
     }
-    destroy() {}
+    destroy() {
+        this.input.removeEventListener('change', this.changeHandler)
+        this.setting.wrapper.removeChild(this.input)
+    }
     // 核心ajax发起请求
     _post() {
         if (!file.rawFile) return
@@ -170,7 +180,15 @@ export class Uploader {
         })
 
         Object.keys(headers).forEach(key => {
-
+            xhr.setRequestHeader(key, headers[key])
         })
+
+        file.status = 'uploading'
+
+        xhr.withCredentials = !!withCredentials
+
+        xhr.onload = () => {
+
+        }
     }
 }
