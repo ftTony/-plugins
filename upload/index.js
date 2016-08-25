@@ -188,7 +188,29 @@ export class Uploader {
         xhr.withCredentials = !!withCredentials
 
         xhr.onload = () => {
-
+            if (xhr.status < 200 || xhr.status >= 300) {
+                file.status = 'error'
+                this._callHook('error', parseError(xhr), file, this.uploadFiles)
+            } else {
+                file.status = 'success'
+                this._callHook('success', parseSuccess(xhr), file, this.uploadFiles)
+            }
         }
+
+        xhr.onerror = e => {
+            file.status = 'error'
+            this._callHook('error', parseError(xhr), file, this.uploadFiles)
+        }
+
+        xhr.upload.onprogress = e => {
+            const {
+                total,
+                loaded
+            } = e
+            e.percent = total > 0 ? loaded / total * 100 : 0
+            this._callHook('progress', e, file, this.uploadFiles)
+        }
+        xhr.open('post', this.setting.url, true)
+        xhr.send(formData)
     }
 }
