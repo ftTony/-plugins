@@ -138,7 +138,18 @@ export class Uploader {
         return true
     }
     // 上传处理
-    upload(file) {}
+    upload(file) {
+        if (!this.uploadFiles.length && !file) retur
+
+        if (file) {
+            const target = this.uploadFiles.find(item => item.uid === file.uid || item.uid === file)
+            target && target.status !== 'success' && this._post(target) && console.log(111)
+        } else {
+            this.uploadFiles.forEach(file => {
+                file.status === 'ready' && this._post(file)
+            })
+        }
+    }
 
     // 交互方法
     chooseFile(file) {
